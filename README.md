@@ -1,3 +1,6 @@
+### Hexlet tests and linter status:
+[![Actions Status](https://github.com/MarinaV38/qa-auto-engineer-javascript-project-90/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/MarinaV38/qa-auto-engineer-javascript-project-90/actions)
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
