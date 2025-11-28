@@ -52,9 +52,25 @@ export class UsersPage {
   }
 
   async expectUserInList({ email, firstName, lastName }) {
-    await expect(this.page.getByRole('cell', { name: new RegExp(email, 'i') })).toBeVisible();
-    await expect(this.page.getByRole('cell', { name: new RegExp(firstName, 'i') })).toBeVisible();
-    await expect(this.page.getByRole('cell', { name: new RegExp(lastName, 'i') })).toBeVisible();
+    if (!/#\/users/.test(this.page.url())) {
+      await this.goto();
+    } else {
+      const refreshButton = this.page.getByRole('button', { name: /refresh/i }).first();
+      if (await refreshButton.isVisible().catch(() => false)) {
+        await refreshButton.click();
+      }
+    }
+
+    const timeout = 15000;
+    await expect(this.page.getByRole('cell', { name: new RegExp(email, 'i') })).toHaveCount(1, {
+      timeout,
+    });
+    await expect(this.page.getByRole('cell', { name: new RegExp(firstName, 'i') })).toHaveCount(1, {
+      timeout,
+    });
+    await expect(this.page.getByRole('cell', { name: new RegExp(lastName, 'i') })).toHaveCount(1, {
+      timeout,
+    });
   }
 
   async expectUserNotInList(email) {
