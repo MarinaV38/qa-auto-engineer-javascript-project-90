@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "npm install @playwright/test@1.56.1 --no-save"
   },
   "dependencies": {
     "@hexlet/testing-task-manager": "^0.1.5",
