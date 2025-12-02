@@ -1,24 +1,23 @@
-import { test } from '@playwright/test';
-import { LoginPage } from './pages/LoginPage';
-import { DashboardPage } from './pages/DashboardPage';
+import { test, expect } from '@playwright/test'
+import Auth from './pages/Auth.js'
+import Header from './pages/Header'
 
-test.describe('Authentication', () => {
-  test('user can sign in with any credentials', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    const dashboardPage = new DashboardPage(page);
+test('авторизация с произвольными данными проходит', async ({ page }) => {
+  const auth = new Auth(page)
+  const header = new Header(page)
 
-    await loginPage.login();
-    await dashboardPage.expectVisible();
-  });
+  await auth.goto()
+  await auth.loginAs('qa_user', 'any_password')
+  await expect(header.profileBtn).toBeVisible()
+})
 
-  test('user can log out from the dashboard', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    const dashboardPage = new DashboardPage(page);
+test('выход возвращает на экран входа', async ({ page }) => {
+  const auth = new Auth(page)
+  const header = new Header(page)
 
-    await loginPage.login();
-    await dashboardPage.expectVisible();
+  await auth.goto()
+  await auth.loginAs('qa_user', 'any_password')
+  await header.signOut()
 
-    await dashboardPage.logout();
-    await loginPage.expectVisible();
-  });
-});
+  await expect(auth.submit).toBeVisible()
+})

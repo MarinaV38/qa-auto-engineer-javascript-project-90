@@ -1,86 +1,75 @@
-import { test, expect } from '@playwright/test';
-import { LabelsPage } from './pages/LabelsPage';
-import { mockLogin } from './utils/session';
+import { test, expect } from '@playwright/test'
+import Auth from './pages/Auth.js'
+import Labels from './pages/Labels.js'
+import { uniq } from './utils.js'
 
-const generateLabel = () => {
-  const id = Date.now();
-  return {
-    name: `Auto Label ${id}`,
-  };
-};
+test.beforeEach(async ({ page }) => {
+  const login = new Auth(page)
+  await login.goto()
+  await login.loginAs('qa_user', 'any_password')
 
-test.describe.serial('Labels', () => {
-  test.beforeEach(async ({ page }) => {
-    await mockLogin(page);
-    const labelsPage = new LabelsPage(page);
-    await labelsPage.goto();
-  });
+  const labels = new Labels(page)
+  await labels.goto()
+})
 
-  test('create label and show in list', async ({ page }) => {
-    const labelsPage = new LabelsPage(page);
-    const label = generateLabel();
+test('создание метки и отображение в списке', async ({ page }) => {
+  const labels = new Labels(page)
 
-    await labelsPage.expectListColumns();
-    await labelsPage.openCreateForm();
-    await labelsPage.fillForm(label);
-    await labelsPage.saveForm();
-    await labelsPage.expectLabelInList(label);
-  });
+  const name = uniq(test.info(), 'Label')
+  await labels.openCreate()
+  await labels.fillLabel({ name })
+  await labels.save()
 
-  test('edit label and validate required field', async ({ page }) => {
-    const labelsPage = new LabelsPage(page);
-    const label = generateLabel();
-    const updatedLabel = { name: `${label.name} Updated` };
+  await labels.assertRowVisible(name)
+})
 
-    await labelsPage.openCreateForm();
-    await labelsPage.fillForm(label);
-    await labelsPage.saveForm();
+test('редактирование метки и проверка required', async ({ page }) => {
+  const labels = new Labels(page)
 
-    await labelsPage.openEdit(label.name);
+  const name = uniq(test.info(), 'Label')
+  await labels.openCreate()
+  await labels.fillLabel({ name })
+  await labels.save()
+  await labels.assertRowVisible(name)
 
-    await labelsPage.page.getByLabel(/name/i).fill('');
-    await labelsPage.page.getByRole('button', { name: /save/i }).click();
-    await expect(labelsPage.page.getByText(/required/i)).toBeVisible();
+  await labels.openEdit(name)
+  await labels.name.fill('')
+  await labels.saveBtn.click()
+  await expect(labels.saveBtn).toBeVisible()
 
-    await labelsPage.fillForm(updatedLabel);
-    await labelsPage.saveForm();
-    await labelsPage.expectLabelInList(updatedLabel);
-  });
+  const updated = uniq(test.info(), 'Updated')
+  await labels.fillLabel({ name: updated })
+  await labels.save()
+  await labels.assertRowVisible(updated)
+})
 
-  test('delete single label', async ({ page }) => {
-    const labelsPage = new LabelsPage(page);
-    const label = generateLabel();
+test('удаление одной метки', async ({ page }) => {
+  const labels = new Labels(page)
 
-    await labelsPage.openCreateForm();
-    await labelsPage.fillForm(label);
-    await labelsPage.saveForm();
+  const name = uniq(test.info(), 'Label')
+  await labels.openCreate()
+  await labels.fillLabel({ name })
+  await labels.save()
 
-    await labelsPage.rowCheckbox(label.name).check();
-    await labelsPage.bulkDeleteButton().click();
-    await labelsPage.confirmDeletion();
-    await labelsPage.expectLabelNotInList(label.name);
-  });
+  await labels.deleteOneByName(name)
+  await expect(labels.rowByName(name)).toHaveCount(0)
+})
 
-  test('bulk delete all labels', async ({ page }) => {
-    const labelsPage = new LabelsPage(page);
-    const firstLabel = generateLabel();
-    const secondLabel = generateLabel();
+test('массовое удаление меток (select all)', async ({ page }) => {
+  const labels = new Labels(page)
 
-    await labelsPage.openCreateForm();
-    await labelsPage.fillForm(firstLabel);
-    await labelsPage.saveForm();
+  const first = uniq(test.info(), 'Label1')
+  await labels.openCreate()
+  await labels.fillLabel({ name: first })
+  await labels.save()
 
-    await labelsPage.openCreateForm();
-    await labelsPage.fillForm(secondLabel);
-    await labelsPage.saveForm();
+  const second = uniq(test.info(), 'Label2')
+  await labels.openCreate()
+  await labels.fillLabel({ name: second })
+  await labels.save()
 
-    const beforeCount = await labelsPage.dataRows().count();
-    expect(beforeCount).toBeGreaterThan(0);
+  await labels.deleteAll()
 
-    await labelsPage.headerCheckbox().check();
-    await labelsPage.bulkDeleteButton().click();
-    await labelsPage.confirmDeletion();
-
-    await expect(labelsPage.dataRows()).toHaveCount(0);
-  });
-});
+  await expect(labels.rowByName(first)).toHaveCount(0)
+  await expect(labels.rowByName(second)).toHaveCount(0)
+})

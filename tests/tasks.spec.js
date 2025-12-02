@@ -1,15 +1,11 @@
 import { test, expect } from '@playwright/test'
+import { mockLogin, resetNavigationCaches } from './utils/session'
 
 const taskCards = (page) => page.locator('[data-rbd-draggable-id], [draggable="true"]')
 
 const loginAndOpenTasks = async (page) => {
-  await page.goto('/')
-  await page.waitForLoadState('domcontentloaded')
-
-  await page.getByLabel(/username/i).fill('admin')
-  await page.getByLabel(/password/i).fill('admin')
-  await page.getByRole('button', { name: /sign in/i }).click()
-  await page.waitForLoadState('networkidle')
+  await mockLogin(page)
+  await resetNavigationCaches(page)
 
   // Напрямую переходим на канбан, чтобы не зависеть от меню/языка.
   await page.goto('/#/tasks?filter=%7B%7D&order=ASC&page=1&perPage=100&sort=index')
@@ -60,7 +56,7 @@ test.describe('Tasks Kanban', () => {
   test('moves task between columns (drag & drop) if supported', async ({ page }) => {
     const sourceCard = taskCards(page).first()
     const targetColumnTitle = page.getByText(/to review/i).first()
-    const targetColumn = targetColumnTitle.locator('..')
+    const targetColumn = targetColumnTitle.locator('xpath=ancestor-or-self::*[@data-rbd-droppable-id][1]')
 
     const canDrag = await sourceCard.count()
     const canDrop = await targetColumnTitle.count()

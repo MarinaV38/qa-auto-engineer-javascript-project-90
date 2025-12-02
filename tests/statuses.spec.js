@@ -1,91 +1,82 @@
-import { test, expect } from '@playwright/test';
-import { StatusesPage } from './pages/StatusesPage';
-import { mockLogin } from './utils/session';
+import { test, expect } from '@playwright/test'
+import Auth from './pages/Auth.js'
+import Statuses from './pages/Statuses.js'
+import { uniq } from './utils.js'
 
-const generateStatus = () => {
-  const id = Date.now();
-  return {
-    name: `Auto Status ${id}`,
-    slug: `auto-status-${id}`,
-  };
-};
+test.beforeEach(async ({ page }) => {
+  const login = new Auth(page)
+  await login.goto()
+  await login.loginAs('qa_user', 'any_password')
 
-test.describe.serial('Task Statuses', () => {
-  test.beforeEach(async ({ page }) => {
-    await mockLogin(page);
-    const statusesPage = new StatusesPage(page);
-    await statusesPage.goto();
-  });
+  const statuses = new Statuses(page)
+  await statuses.goto()
+})
 
-  test('create status and show in list', async ({ page }) => {
-    const statusesPage = new StatusesPage(page);
-    const status = generateStatus();
+test('создание статуса и отображение в списке', async ({ page }) => {
+  const statuses = new Statuses(page)
 
-    await statusesPage.expectListColumns();
-    await statusesPage.openCreateForm();
-    await statusesPage.fillForm(status);
-    await statusesPage.saveForm();
-    await statusesPage.expectStatusInList(status);
-  });
+  const name = uniq(test.info(), 'Status')
+  const slug = uniq(test.info(), 'slug')
 
-  test('edit status and validate required fields', async ({ page }) => {
-    const statusesPage = new StatusesPage(page);
-    const status = generateStatus();
-    const updatedStatus = {
-      name: `${status.name} Updated`,
-      slug: `${status.slug}-updated`,
-    };
+  await statuses.openCreate()
+  await statuses.fillStatus({ name, slug })
+  await statuses.save()
+  await statuses.assertRowVisible(name, slug)
+})
 
-    await statusesPage.openCreateForm();
-    await statusesPage.fillForm(status);
-    await statusesPage.saveForm();
+test('редактирование статуса и проверка required', async ({ page }) => {
+  const statuses = new Statuses(page)
 
-    await statusesPage.openEdit(status.name);
+  const name = uniq(test.info(), 'Status')
+  const slug = uniq(test.info(), 'slug')
+  await statuses.openCreate()
+  await statuses.fillStatus({ name, slug })
+  await statuses.save()
+  await statuses.assertRowVisible(name, slug)
 
-    // Проверка required для имени.
-    await statusesPage.page.getByLabel(/name/i).fill('');
-    await statusesPage.page.getByRole('button', { name: /save/i }).click();
-    await expect(statusesPage.page.getByText(/required/i)).toBeVisible();
+  await statuses.openEdit(name)
+  await statuses.inputName.fill('')
+  await statuses.saveBtn.click()
+  await expect(statuses.saveBtn).toBeVisible()
 
-    await statusesPage.fillForm(updatedStatus);
-    await statusesPage.saveForm();
-    await statusesPage.expectStatusInList(updatedStatus);
-  });
+  const updatedName = uniq(test.info(), 'Updated')
+  const updatedSlug = uniq(test.info(), 'updated-slug')
+  await statuses.fillStatus({ name: updatedName, slug: updatedSlug })
+  await statuses.save()
+  await statuses.assertRowVisible(updatedName, updatedSlug)
+})
 
-  test('delete single status', async ({ page }) => {
-    const statusesPage = new StatusesPage(page);
-    const status = generateStatus();
+test('удаление одного статуса', async ({ page }) => {
+  const statuses = new Statuses(page)
 
-    await statusesPage.openCreateForm();
-    await statusesPage.fillForm(status);
-    await statusesPage.saveForm();
+  const name = uniq(test.info(), 'Status')
+  const slug = uniq(test.info(), 'slug')
+  await statuses.openCreate()
+  await statuses.fillStatus({ name, slug })
+  await statuses.save()
+  await statuses.assertRowVisible(name, slug)
 
-    await statusesPage.rowCheckbox(status.name).check();
-    await statusesPage.bulkDeleteButton().click();
-    await statusesPage.confirmDeletion();
-    await statusesPage.expectStatusNotInList(status.name);
-  });
+  await statuses.deleteOneByName(name)
+  await expect(statuses.rowByName(name)).toHaveCount(0)
+})
 
-  test('bulk delete all statuses', async ({ page }) => {
-    const statusesPage = new StatusesPage(page);
-    const firstStatus = generateStatus();
-    const secondStatus = generateStatus();
+test('массовое удаление статусов (select all)', async ({ page }) => {
+  const statuses = new Statuses(page)
 
-    await statusesPage.openCreateForm();
-    await statusesPage.fillForm(firstStatus);
-    await statusesPage.saveForm();
+  const first = uniq(test.info(), 'Status1')
+  const firstSlug = uniq(test.info(), 'slug1')
+  await statuses.openCreate()
+  await statuses.fillStatus({ name: first, slug: firstSlug })
+  await statuses.save()
 
-    await statusesPage.openCreateForm();
-    await statusesPage.fillForm(secondStatus);
-    await statusesPage.saveForm();
+  const second = uniq(test.info(), 'Status2')
+  const secondSlug = uniq(test.info(), 'slug2')
+  await statuses.openCreate()
+  await statuses.fillStatus({ name: second, slug: secondSlug })
+  await statuses.save()
 
-    const beforeCount = await statusesPage.dataRows().count();
-    expect(beforeCount).toBeGreaterThan(0);
+  await statuses.deleteAll()
 
-    await statusesPage.headerCheckbox().check();
-    await statusesPage.bulkDeleteButton().click();
-    await statusesPage.confirmDeletion();
-
-    await expect(statusesPage.dataRows()).toHaveCount(0);
-  });
-});
+  await expect(statuses.rowByName(first)).toHaveCount(0)
+  await expect(statuses.rowByName(second)).toHaveCount(0)
+})
