@@ -1,19 +1,33 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/MarinaV38/qa-auto-engineer-javascript-project-90/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/MarinaV38/qa-auto-engineer-javascript-project-90/actions)
 
-# React + Vite
+# Task Manager E2E (Playwright)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Учебный проект с тестируемым приложением «Task Manager» (React + Vite) и набором E2E-тестов на Playwright. Покрыты сценарии аутентификации, CRUD пользователей/статусов/меток и базовые проверки канбан-доски.
 
-Currently, two official plugins are available:
+## Используемые технологии
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18, Vite
+- Playwright 1.56 (тесты, Page Object'ы)
+- React Admin (в составе `@hexlet/testing-task-manager`)
 
-## React Compiler
+## Установка и запуск
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# установка зависимостей
+npm install
 
-## Expanding the ESLint configuration
+# запуск dev-сервера
+npm run dev
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# сборка
+npm run build
+
+# прогон всех e2e-тестов
+npx playwright test
+```
+
+## Структура тестов
+
+- `tests/pages/*.js` — Page Object'ы для основных разделов
+- `tests/*.spec.js` — тестовые сценарии (auth, users, statuses, labels, tasks, smoke)
