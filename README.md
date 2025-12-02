@@ -4,7 +4,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MarinaV38_qa-auto-engineer-javascript-project-90&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=MarinaV38_qa-auto-engineer-javascript-project-90)
 # Task Manager E2E (Playwright)
 
-Учебный проект с тестируемым приложением «Task Manager» (React + Vite) и набором E2E-тестов на Playwright. Покрыты сценарии аутентификации, CRUD пользователей/статусов/меток и базовые проверки канбан-доски.
+Учебный проект с тестируемым приложением «Task Manager» (React + Vite) и набором E2E-тестов на Playwright. Покрыты сценарии аутентификации, CRUD пользователей/статусов/меток и базовые проверки канбан-доски
 
 ## Используемые технологии
 
