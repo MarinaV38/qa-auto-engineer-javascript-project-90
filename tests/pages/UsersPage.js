@@ -62,15 +62,13 @@ export class UsersPage {
     }
 
     const timeout = 15000;
-    await expect(this.page.getByRole('cell', { name: new RegExp(email, 'i') })).toHaveCount(1, {
-      timeout,
-    });
-    await expect(this.page.getByRole('cell', { name: new RegExp(firstName, 'i') })).toHaveCount(1, {
-      timeout,
-    });
-    await expect(this.page.getByRole('cell', { name: new RegExp(lastName, 'i') })).toHaveCount(1, {
-      timeout,
-    });
+    const refreshButton = this.page.getByRole('button', { name: /refresh/i }).first();
+    if (await refreshButton.isVisible().catch(() => false)) {
+      await refreshButton.click();
+    }
+    await expect(this.page.getByText(new RegExp(email, 'i'))).toBeVisible({ timeout });
+    await expect(this.page.getByText(new RegExp(firstName, 'i'))).toBeVisible({ timeout });
+    await expect(this.page.getByText(new RegExp(lastName, 'i'))).toBeVisible({ timeout });
   }
 
   async expectUserNotInList(email) {

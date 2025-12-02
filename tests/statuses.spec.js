@@ -13,6 +13,7 @@ test.describe.serial('Task Statuses', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('username', 'admin');
+      window.localStorage.removeItem('ra.list.task_statuses');
     });
     const statusesPage = new StatusesPage(page);
     await statusesPage.goto();

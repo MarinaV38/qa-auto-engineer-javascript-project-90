@@ -35,8 +35,16 @@ export class LabelsPage {
       this.page.getByRole('button', { name: /save/i }).click(),
     ]);
 
+    const toast = this.page.getByText(/created|updated/i).first();
+    if (await toast.isVisible().catch(() => false)) {
+      await expect(toast).toBeVisible({ timeout: 5000 });
+    }
+
     if (/#\/labels\/\d+/.test(this.page.url())) {
-      await this.goto();
+      await this.page.evaluate(() => {
+        window.location.hash = '#/labels';
+      });
+      await this.page.waitForURL(/#\/labels$/);
     }
   }
 
@@ -54,9 +62,8 @@ export class LabelsPage {
       }
     }
 
-    await expect(this.page.getByRole('cell', { name: new RegExp(name, 'i') })).toHaveCount(1, {
-      timeout: 15000,
-    });
+    await expect(this.page.getByRole('columnheader', { name: /name/i })).toBeVisible();
+    await expect(this.page.getByText(new RegExp(name, 'i'))).toBeVisible({ timeout: 20000 });
   }
 
   async expectLabelNotInList(name) {

@@ -12,6 +12,7 @@ test.describe.serial('Labels', () => {
   test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('username', 'admin');
+      window.localStorage.removeItem('ra.list.labels');
     });
     const labelsPage = new LabelsPage(page);
     await labelsPage.goto();

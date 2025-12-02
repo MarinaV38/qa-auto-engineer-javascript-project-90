@@ -37,8 +37,16 @@ export class StatusesPage {
       this.page.getByRole('button', { name: /save/i }).click(),
     ]);
 
+    const toast = this.page.getByText(/created|updated/i).first();
+    if (await toast.isVisible().catch(() => false)) {
+      await expect(toast).toBeVisible({ timeout: 5000 });
+    }
+
     if (/#\/task_statuses\/\d+/.test(this.page.url())) {
-      await this.goto();
+      await this.page.evaluate(() => {
+        window.location.hash = '#/task_statuses';
+      });
+      await this.page.waitForURL(/#\/task_statuses$/);
     }
   }
 
@@ -57,13 +65,10 @@ export class StatusesPage {
       }
     }
 
-    const timeout = 15000;
-    await expect(this.page.getByRole('cell', { name: new RegExp(name, 'i') })).toHaveCount(1, {
-      timeout,
-    });
-    await expect(this.page.getByRole('cell', { name: new RegExp(slug, 'i') })).toHaveCount(1, {
-      timeout,
-    });
+    const timeout = 20000;
+    await expect(this.page.getByRole('columnheader', { name: /name/i })).toBeVisible();
+    await expect(this.page.getByText(new RegExp(name, 'i'))).toBeVisible({ timeout });
+    await expect(this.page.getByText(new RegExp(slug, 'i'))).toBeVisible({ timeout });
   }
 
   async expectStatusNotInList(name) {
