@@ -8,8 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:e2e": "playwright test",
-    "postinstall": "npm install @playwright/test@1.56.1 --no-save"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@hexlet/testing-task-manager": "^0.1.5",
