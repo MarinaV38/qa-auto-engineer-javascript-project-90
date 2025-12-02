@@ -1,10 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { mockLogin } from './utils/session';
 
 test.beforeEach(async ({ page }) => {
-  // Сохраняем пользователя заранее, чтобы избежать экран логина.
-  await page.addInitScript(() => {
-    window.localStorage.setItem('username', 'admin');
-  });
+  await mockLogin(page);
 });
 
 test('application renders dashboard', async ({ page }) => {

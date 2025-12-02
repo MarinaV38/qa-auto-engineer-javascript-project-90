@@ -11,12 +11,8 @@ const loginAndOpenTasks = async (page) => {
   await page.getByRole('button', { name: /sign in/i }).click()
   await page.waitForLoadState('networkidle')
 
-  const tasksMenuItem = page.getByRole('menuitem', { name: /^(tasks|задачи)$/i })
-  if (await tasksMenuItem.count()) {
-    await tasksMenuItem.first().click()
-  } else {
-    await page.getByRole('link', { name: /^(tasks|задачи)$/i }).first().click()
-  }
+  // Напрямую переходим на канбан, чтобы не зависеть от меню/языка.
+  await page.goto('/#/tasks?filter=%7B%7D&order=ASC&page=1&perPage=100&sort=index')
   await page.waitForURL(/#\/tasks\b/i, { timeout: 10000 })
 }
 

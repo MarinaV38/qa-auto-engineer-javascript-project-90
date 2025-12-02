@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { LabelsPage } from './pages/LabelsPage';
+import { mockLogin } from './utils/session';
 
 const generateLabel = () => {
   const id = Date.now();
@@ -10,10 +11,7 @@ const generateLabel = () => {
 
 test.describe.serial('Labels', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      window.localStorage.setItem('username', 'admin');
-      window.localStorage.removeItem('ra.list.labels');
-    });
+    await mockLogin(page);
     const labelsPage = new LabelsPage(page);
     await labelsPage.goto();
   });

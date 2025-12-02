@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { StatusesPage } from './pages/StatusesPage';
+import { mockLogin } from './utils/session';
 
 const generateStatus = () => {
   const id = Date.now();
@@ -11,10 +12,7 @@ const generateStatus = () => {
 
 test.describe.serial('Task Statuses', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      window.localStorage.setItem('username', 'admin');
-      window.localStorage.removeItem('ra.list.task_statuses');
-    });
+    await mockLogin(page);
     const statusesPage = new StatusesPage(page);
     await statusesPage.goto();
   });

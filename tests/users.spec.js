@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from './pages/LoginPage';
 import { UsersPage } from './pages/UsersPage';
+import { mockLogin } from './utils/session';
 
 const generateUser = () => {
   const id = Date.now();
@@ -13,10 +14,7 @@ const generateUser = () => {
 
 test.describe.serial('Users', () => {
   test.beforeEach(async ({ page }) => {
-    // Авторизуемся и открываем список пользователей.
-    await page.addInitScript(() => {
-      window.localStorage.setItem('username', 'admin');
-    });
+    await mockLogin(page);
     const usersPage = new UsersPage(page);
     await usersPage.goto();
   });
