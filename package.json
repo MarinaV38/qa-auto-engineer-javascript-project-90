@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "test:e2e": "playwright test",
-    "postinstall": "npm install @playwright/test@1.56.1 --no-save --ignore-scripts && npx playwright install --with-deps"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hexlet/testing-task-manager": "^0.1.5",
@@ -18,7 +16,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@playwright/test": "1.56.1",
     "@types/node": "^24.10.1",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
