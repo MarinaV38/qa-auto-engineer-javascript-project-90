@@ -12,12 +12,12 @@ const loginAndOpenTasks = async (page) => {
   await page.waitForURL(/#\/tasks\b/i, { timeout: 10000 })
 }
 
-test.describe('Tasks Kanban', () => {
+test.describe('Канбан задач', () => {
   test.beforeEach(async ({ page }) => {
     await loginAndOpenTasks(page)
   })
 
-  test('renders task columns', async ({ page }) => {
+  test('отображаются колонки задач', async ({ page }) => {
     const draft = page.getByRole('heading', { name: /^draft$/i }).first()
     const toReview = page.getByRole('heading', { name: /^to review$/i }).first()
     const toBeFixed = page.getByRole('heading', { name: /^to be fixed$/i }).first()
@@ -31,7 +31,7 @@ test.describe('Tasks Kanban', () => {
     await expect(published).toBeVisible({ timeout: 10000 })
   })
 
-  test('filters tasks by text if filter exists', async ({ page }) => {
+  test('фильтрует задачи по тексту, если есть фильтр', async ({ page }) => {
     const byPlaceholder = page.getByPlaceholder(/filter|search|поиск/i).first()
     const byRole = page.getByRole('textbox', { name: /filter|search|поиск/i }).first()
     const hasPlaceholder = await byPlaceholder.count()
@@ -53,7 +53,7 @@ test.describe('Tasks Kanban', () => {
     expect(after).toBeLessThanOrEqual(before)
   })
 
-  test('moves task between columns (drag & drop) if supported', async ({ page }) => {
+  test('перетаскивает задачу между колонками, если доступен dnd', async ({ page }) => {
     const sourceCard = taskCards(page).first()
     const targetColumnTitle = page.getByText(/to review/i).first()
     const targetColumn = targetColumnTitle.locator('xpath=ancestor-or-self::*[@data-rbd-droppable-id][1]')
