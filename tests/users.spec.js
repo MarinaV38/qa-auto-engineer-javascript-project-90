@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import Auth from './pages/Auth.js'
 import Users from './pages/Users.js'
-import { uniqEmail } from './utils.js'
+import { uniqEmail } from './utils/index.js'
 
 test.beforeEach(async ({ page }) => {
   const login = new Auth(page)

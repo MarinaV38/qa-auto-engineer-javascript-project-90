@@ -7,7 +7,6 @@ const loginAndOpenTasks = async (page) => {
   await mockLogin(page)
   await resetNavigationCaches(page)
 
-  // Напрямую переходим на канбан, чтобы не зависеть от меню/языка.
   await page.goto('/#/tasks?filter=%7B%7D&order=ASC&page=1&perPage=100&sort=index')
   await page.waitForURL(/#\/tasks\b/i, { timeout: 10000 })
 }

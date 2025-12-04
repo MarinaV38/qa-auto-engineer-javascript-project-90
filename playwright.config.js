@@ -1,7 +1,9 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:4173';
+const host = process.env.PLAYWRIGHT_HOST || '127.0.0.1';
+const port = Number(process.env.PLAYWRIGHT_PORT) || 41730;
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://${host}:${port}`;
 
 /**
  * Read environment variables from file.
@@ -75,7 +77,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev -- --host --port 4173 --strictPort',
+    command: `npm run dev -- --host ${host} --port ${port} --strictPort`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

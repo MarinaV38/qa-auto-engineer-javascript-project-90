@@ -1,5 +1,3 @@
-// tests/pages/Auth.js
-
 export default class Auth {
   constructor(page) {
     this.page = page;

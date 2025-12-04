@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import Auth from './pages/Auth.js'
 import Labels from './pages/Labels.js'
-import { uniq } from './utils.js'
+import { uniq } from './utils/index.js'
 
 test.beforeEach(async ({ page }) => {
   const login = new Auth(page)

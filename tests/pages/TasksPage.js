@@ -22,8 +22,7 @@ export class TasksPage {
     if (await refreshButton.isVisible().catch(() => false)) {
       await refreshButton.click();
     }
-    await this.page.waitForTimeout(500); // дать времени на перерендер доски
-    // Убедимся, что колоноки/карточки отрендерились (используем базовые задачи из фикстур).
+    await this.page.waitForTimeout(500);
     await this.page.getByText(/Task 1/).first().waitFor({ timeout: 10000 });
   }
 
@@ -43,7 +42,6 @@ export class TasksPage {
   }
 
   async fillForm({ assignee, title, content, status }) {
-    // Assignee select
     await this.page.getByLabel(/assignee/i).click();
     await this.page.getByRole('option', { name: new RegExp(assignee, 'i') }).click();
 
@@ -54,14 +52,12 @@ export class TasksPage {
 
     await this.page.getByLabel(/status/i).click();
     await this.page.getByRole('option', { name: new RegExp(status, 'i') }).click();
-    // Закрываем раскрытый список статусов, чтобы не перекрывал поле меток.
     await this.page.keyboard.press('Escape');
     const statusMenu = this.page.locator('[id^="menu-status_id"]');
     if (await statusMenu.isVisible().catch(() => false)) {
       await statusMenu.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
     }
 
-    // Выбор меток опускаем, чтобы не ловить перекрытия и таймауты.
   }
 
   async saveForm() {
@@ -90,7 +86,6 @@ export class TasksPage {
     try {
       await expect(cardLocator()).toBeVisible({ timeout: 10000 });
     } catch (e) {
-      // Если по каким-то причинам карточка не отобразилась, не валим все тесты.
       console.warn(`Task card "${title}" not visible after retries`, e.message);
     }
   }
